@@ -248,18 +248,14 @@ class CentreonHostGroup extends CentreonObject
      *
      * @return void
      */
-    public function export($filter_id=null, $filter_name=null)
-    {
+    public function export($filter_id=null, $filter_name=null) {
         $filters = null;
         if (!is_null($filter_id)) {
             $filters = array('hg_id' => $filter_id);
         }
         parent::export($filters);
-
-        $relObj = new \Centreon_Object_Relation_Host_Group_Host();
-        $hostObj = new \Centreon_Object_Host();
-
-
+        $relObj = new Centreon_Object_Relation_Host_Group_Host();
+        $hostObj = new Centreon_Object_Host();
         $hgFieldName = $this->object->getUniqueLabelField();
         $hFieldName = $hostObj->getUniqueLabelField();
         $elements = $relObj->getMergedParameters(
@@ -267,15 +263,14 @@ class CentreonHostGroup extends CentreonObject
             array($hFieldName, 'host_id'),
             -1,
             0,
-            $hgFieldName,
-            null
-        );
+            null,
+            "ASC",
+            array('hg_name' => $filter_name),
+            "AND");
         foreach ($elements as $element) {
             $this->api->export_filter('HOST', $element['host_id'], $element[$hFieldName]);
-            echo $this->action . $this->delim
-                . "addhost" . $this->delim
-                . $element[$hgFieldName] . $this->delim
-                . $element[$hFieldName] . "\n";
+            echo $this->action . $this->delim . "addhost" . $this->delim . $element[$hgFieldName] . $this->delim.$element[$hFieldName] . "\n";
         }
     }
+
 }
